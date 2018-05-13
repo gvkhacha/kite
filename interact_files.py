@@ -29,9 +29,15 @@ def loadIndexFromFile() -> dict:
 	with open('index.pickle', 'rb') as file:
 		return pickle.load(file)
 
+
 def main():
+	test = dict()
 	for i in readFromBook():
-		print(DocID(i).getURL())
+		x = DocID(i)
+		test[x.getID()] = x.getURL()
+	# saveIndexToFile(test)
+	load = loadIndexFromFile()
+	assert test == load
 
 if __name__ == '__main__':
 	main()
