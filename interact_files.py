@@ -1,5 +1,5 @@
 from structures import DocID
-import pickle
+import pickle, os
 
 # Bookkeeping has path and URL for documents
 BOOKDIR = 'WEBPAGES_RAW/bookkeeping.json'
@@ -28,6 +28,12 @@ def saveIndexToFile(index: dict) -> None:
 def loadIndexFromFile() -> dict:
 	with open('index.pickle', 'rb') as file:
 		return pickle.load(file)
+
+def resetIndexFile() -> None:
+	try:
+		os.rename('index.pickle', 'index.pickle.bak')
+	except FileNotFoundError:
+		pass # File never existed in first place
 
 
 def main():
