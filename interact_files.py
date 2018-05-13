@@ -3,6 +3,7 @@ import pickle, os
 
 # Bookkeeping has path and URL for documents
 BOOKDIR = 'WEBPAGES_RAW/bookkeeping.json'
+TMP = 10 #Change to -1 when done testing
 
 
 def readFromBook():
@@ -12,11 +13,11 @@ def readFromBook():
 	TMPCOUNT = 0 #Temporary count, for init testing, we only use ~30 docs
 	with open(BOOKDIR, 'r') as bf:
 		for line in bf:
-			if len(line) < 4:
+			if len(line) < 4: # line is { or }, ignore.
 				continue
 			#TMP
 			TMPCOUNT += 1
-			if TMPCOUNT > 30:
+			if TMP == -1 or TMPCOUNT > TMP:
 				break
 			#TMPEND
 			yield line.strip().strip('",')
