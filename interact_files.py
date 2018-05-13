@@ -6,7 +6,10 @@ class DocID:
 	def __init__(self, bookentry: str):
 		""" Bookentry is the egntry inside bookkeeping.json
 		that has a document ID/path to raw file, and URL """
-		print(bookentry)
+		rawEntry = bookentry.replace('"', '').split(': ')
+		self._ID = tuple(rawEntry[0].split('/'))
+		self._URL = rawEntry[1]
+		self._filepath = 'WEBPAGES_RAW/' + rawEntry[0]
 
 def readFromBook():
 	"""Generator that will handle opening the file and closing to 
@@ -15,13 +18,14 @@ def readFromBook():
 	TMPCOUNT = 0 #Temporary count, for init testing, we only use ~30 docs
 	with open(BOOKDIR, 'r') as bf:
 		for line in bf:
+			if len(line) < 4:
+				continue
 			#TMP
 			TMPCOUNT += 1
 			if TMPCOUNT > 30:
 				break
 			#TMPEND
-
-			yield line.strip().strip(',')
+			yield line.strip().strip('",')
 
 
 def main():
