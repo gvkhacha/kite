@@ -1,3 +1,6 @@
+from html.parser import HTMLParser
+from collections import defaultdict
+
 class DocID:
 	def __init__(self, bookentry: str):
 		""" Bookentry is the egntry inside bookkeeping.json
@@ -15,3 +18,18 @@ class DocID:
 
 	def getPath(self) -> str:
 		return self._filepath
+
+class Parser(HTMLParser):
+	_tokens = defaultdict(int)
+	# def handle_starttag(self, tag, attrs):
+	# 	print("Encountered a start tag:", tag)
+
+	# def handle_endtag(self, tag):
+	# 	print("Encountered an end tag :", tag)
+
+	def handle_data(self, data):
+		# print("Encountered some data  :", data)
+		for i in data.split():
+			self._tokens[i] += 1
+	def getTokens(self):
+		return self._tokens

@@ -1,11 +1,12 @@
-from structures import DocID
+from structures import DocID, Parser
 from collections import defaultdict
 
 import interact_files
 
 import lxml.html.diff
+import lxml.etree
 
-import sys
+import sys, io
 
 
 
@@ -17,8 +18,11 @@ def tokenizeDoc(doc: DocID) -> [(str, int)]:
 	htmlFile = None
 	try:
 		htmlFile = open(doc.getPath())
-		print(lxml.html.diff.tokenize(htmlFile.read()))
+		p = Parser()
+		p.feed(htmlFile.read())
+		print(p.getTokens())
 	except:
+		# print(doc.getPath())
 		raise #Not sure yet... re-raise
 	finally:
 		if htmlFile:
