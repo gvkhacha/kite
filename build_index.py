@@ -10,7 +10,7 @@ import sys, io
 
 
 
-def tokenizeDoc(doc: DocID) -> [(str, int)]:
+def tokenizeDoc(doc: DocID, index: dict) -> [(str, int)]:
 	""" Reads document's file and parses through tokens
 	For now, only considers occurances
 	Return: [(token, occurances)]
@@ -20,7 +20,7 @@ def tokenizeDoc(doc: DocID) -> [(str, int)]:
 		htmlFile = open(doc.getPath())
 		p = Parser()
 		p.feed(htmlFile.read())
-		print(p.getTokens())
+		index[doc.getID()].extend(p.getTokens().items())
 	except:
 		# print(doc.getPath())
 		raise #Not sure yet... re-raise
@@ -30,12 +30,18 @@ def tokenizeDoc(doc: DocID) -> [(str, int)]:
 
 
 
+def prettyPrintIndex(index: dict):
+	for doc, postings in index.items():
+		print("{}: ".format(doc))
+		for token, count in postings:
+			print("\t{} : {}".format(token, count))
 
 
 def main(index: dict):
 	for l in interact_files.readFromBook():
 		x = DocID(l)
-		tokenizeDoc(x)
+		tokenizeDoc(x, index)
+	prettyPrintIndex(index)
 
 
 if __name__ == '__main__':
