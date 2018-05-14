@@ -11,7 +11,7 @@ import sys, io
 
 
 
-def tokenizeDoc(doc: DocID, index: dict) -> [(str, int)]:
+def tokenizeDoc(doc: DocID, index: dict, imgIndex: dict) -> [(str, int)]:
 	""" Reads document's file and parses through tokens
 	For now, only considers occurances
 	Return: [(token, occurances)]
@@ -22,26 +22,27 @@ def tokenizeDoc(doc: DocID, index: dict) -> [(str, int)]:
 		print("HALLO")
 		soup = BeautifulSoup(htmlFile, 'lxml')
 		comments=soup.find_all(string=lambda text:isinstance(text,Comment))
-		# print(soup.find_all('img'))
-		# print(soup.children)
-		for i in soup.descendants:
-			print(i.name)
-			print('\n-------\n')
+		title = soup.title
+		if title != None:
+			title = title.text #remove <title> tag
+		# for i in soup.descendants:
+		# 	print(i.name)
+		# 	print('\n-------\n')
 
-			if i.name == None:
-				if i in comments:
-					print("Found a comment")
-				else:
-					print("Found some text-not comment")
-				#At text content, can start getting data. 
-				# COULD start considering parents i.parent.name == h1 -> Better to do it before?
-			elif i.name == 'img':
-				#Found an image, add to image index
-				pass
-			print('\n-------\n')
-			print(i)
-			print('\n-------\n')
-			# print(repr(i))
+		# 	if i.name == None:
+		# 		if i in comments:
+		# 			print("Found a comment")
+		# 		else:
+		# 			#At text content, can start getting data. 
+		# 			# COULD start considering parents i.parent.name == h1 -> Better to do it before?
+		# 			print("Found some text-not comment")
+		# 	elif i.name == 'img':
+		# 		#Found an image, add to image index
+		# 		pass
+		# 	print('\n-------\n')
+		# 	print(i)
+		# 	print('\n-------\n')
+		# 	# print(repr(i))
 			# print(type(i))
 	except:
 		# print(doc.getPath())
@@ -72,10 +73,12 @@ def main(index: dict):
 
 if __name__ == '__main__':
 	if len(sys.argv) == 1:
-		index = interact_files.loadIndexFromFile()
+		index = interact_files.loadIndexFromFile('main')
+		imgIndex = interact_files.loadIndexFromFile('img')
 	elif sys.argv[1] in {'-r', 'reload'}:
-		index = defaultdict(list)
-		interact_files.resetIndexFile()
+		index = defaultdict(list) # {token : [(docID, priority)]}
+		imgIndex = defaultdict(list) # {(title, imgAlt): [(srcurl, priority)]}
+		interact_files.resetIndexFiles()
 	else:
 		raise Warning("Invalid command line input")
 
