@@ -3,7 +3,7 @@ import pickle, os
 
 # Bookkeeping has path and URL for documents
 BOOKDIR = 'WEBPAGES_RAW/bookkeeping.json'
-TMP = 2 #Change to -1 when done testing
+TMP = 3 #Change to -1 when done testing
 
 
 def readFromBook():

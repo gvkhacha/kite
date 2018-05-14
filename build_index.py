@@ -1,10 +1,11 @@
-from structures import DocID, Parser
+from structures import DocID
 from collections import defaultdict
 
 import interact_files
 
 import lxml.html.diff
 import lxml.etree
+from bs4 import BeautifulSoup
 
 import sys, io
 
@@ -18,9 +19,15 @@ def tokenizeDoc(doc: DocID, index: dict) -> [(str, int)]:
 	htmlFile = None
 	try:
 		htmlFile = open(doc.getPath())
-		p = Parser()
-		p.feed(htmlFile.read())
-		index[doc.getID()].extend(p.getTokens().items())
+		print("HALLO")
+		soup = BeautifulSoup(htmlFile, 'lxml')
+		# print(soup.find_all('img'))
+		# print(soup.children)
+		for i in soup.descendants:
+			# print(i.name)
+			print(i)
+			# print(repr(i))
+			# print(type(i))
 	except:
 		# print(doc.getPath())
 		raise #Not sure yet... re-raise
