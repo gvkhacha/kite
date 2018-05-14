@@ -1,61 +1,21 @@
-from structures import DocID
+from structures import DocID, Tokenizer
 from collections import defaultdict
 
 import interact_files
 
 import lxml.html.diff
 import lxml.etree
-from bs4 import BeautifulSoup, Comment
 
 import sys, io
 
 
-
-def tokenizeDoc(doc: DocID, index: dict, imgIndex: dict) -> [(str, int)]:
+def tokenizeDoc(doc: DocID, index: dict, imgIndex: dict) -> None:
 	""" Reads document's file and parses through tokens
 	For now, only considers occurances
-	Return: [(token, occurances)]
 	"""
-	htmlFile = None
-	try:
-		htmlFile = open(doc.getPath())
-		print("HALLO")
-		soup = BeautifulSoup(htmlFile, 'lxml')
-		comments=soup.find_all(string=lambda text:isinstance(text,Comment))
-		title = soup.title
-		if title != None:
-			title = title.text #remove <title> tag
-		for i in soup.descendants:
-			print(i.name)
-			print('\n-------\n')
+	t = Tokenizer(doc, index, imgIndex)
+	t.findAllTokens()
 
-			if i.name == None:
-				if i in comments:
-					print("Found a comment")
-				else:
-					#At text content, can start getting data. 
-					# COULD start considering parents i.parent.name == h1 -> Better to do it before?
-					print("Found some text-not comment")
-			elif i.name == 'img':
-				#Found an image, add to image index
-				print(i.attrs)
-				root = doc.getURL().split('/')
-				if '.' in root[-1]:
-					root = root[:-1]
-				rootURL = '/'.join(root) + '/'
-				imgIndex[(title, i.get('alt'))].append( (rootURL + i['src'], 1) ) # 1 is temporary priority (?)
-				# imgIndex[(title, )]
-			# print('\n-------\n')
-			# print(i)
-			# print('\n-------\n')
-			# # print(repr(i))
-			# print(type(i))
-	except:
-		# print(doc.getPath())
-		raise #Not sure yet... re-raise
-	finally:
-		if htmlFile:
-			htmlFile.close()
 
 
 
