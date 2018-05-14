@@ -39,8 +39,11 @@ def prettyPrintIndex(index: dict):
 
 def main(index: dict):
 	for l in interact_files.readFromBook():
-		x = DocID(l)
-		tokenizeDoc(x, index)
+		d = DocID(l)
+		if d.getID() in index:
+			continue
+		else:
+			tokenizeDoc(d, index)
 	prettyPrintIndex(index)
 
 

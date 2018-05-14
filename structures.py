@@ -29,7 +29,8 @@ class Parser(HTMLParser):
 
 	def handle_data(self, data):
 		# print("Encountered some data  :", data)
-		for i in data.split():
-			self._tokens[i] += 1
+		for tok in data.split():
+			# change tok, canonicalize, etc.
+			self._tokens[tok.lower()] += 1
 	def getTokens(self):
 		return self._tokens
