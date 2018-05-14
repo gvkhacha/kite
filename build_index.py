@@ -87,4 +87,5 @@ if __name__ == '__main__':
 	except KeyboardInterrupt:
 		pass
 	finally:
-		interact_files.saveIndexToFile(index)
+		interact_files.saveIndexToFile(index, 'main')
+		interact_files.saveIndexToFile(imgIndex, 'img')

@@ -43,7 +43,7 @@ def loadIndexFromFile(indexType='main') -> dict:
 	else:
 		raise Warning('Invalid function call - incorrect type defined')
 
-def resetIndexFile() -> None:
+def resetIndexFiles() -> None:
 	try:
 		os.rename('index.pickle', 'index.pickle.bak')
 		os.rename('imgIndex.pickle', 'imgIndex.pickle.bak')
@@ -60,5 +60,6 @@ def main():
 	testImg = loadIndexFromFile('img')
 	assert index == testIndex
 	assert imgIndex == testImg
+
 if __name__ == '__main__':
 	main()
