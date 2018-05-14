@@ -54,5 +54,10 @@ class Tokenizer:
 		self._rootURL = '/'.join(root) + '/'	
 
 	def _addImage(self, element):
-		print(element.attrs)
-		self._imgIndex[(self._title, element.get('alt'))].append( (self._rootURL + element['src'], 1) ) # 1 is temporary priority (?)
+		alt = element.get('alt')
+		if alt == None:
+			alt = ''
+
+		key = (self._title, alt)
+		val = (self._rootURL + element['src'], len(list(element.parents)) * 0.22)
+		self._imgIndex[key].append(val)
