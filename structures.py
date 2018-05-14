@@ -1,7 +1,9 @@
 from html.parser import HTMLParser
 from collections import defaultdict
 from bs4 import BeautifulSoup, Comment
+import re
 
+IMPORTANT = re.compile('h[1-6]') #to add more later
 
 class DocID:
 	def __init__(self, bookentry: str):
@@ -38,8 +40,7 @@ class Tokenizer:
 				if element in self._comments:
 					print("Found a comment!")
 				else:
-					print("Found some non-text comment")
-					#Could check parents for importance
+					self._addText(element)
 			elif element.name == 'img':
 				self._addImage(element)
 
@@ -61,3 +62,15 @@ class Tokenizer:
 		key = (self._title, alt)
 		val = (self._rootURL + element['src'], len(list(element.parents)) * 0.22)
 		self._imgIndex[key].append(val)
+
+	def _addText(self, element):
+		parents = list(element.parents)
+		weight = 0
+		print('Found text\n\tPARENTS:')
+		for i in parents:
+			print(i.name)
+		if 'p' in parents:
+			print('\t{}'.format(element))
+		elif any([IMPORTANT.match(i.name) for i  in parents]):
+			print("THIS IS IMPORTANT!!!!")
+			print(element)
