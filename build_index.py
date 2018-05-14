@@ -5,7 +5,7 @@ import interact_files
 
 import lxml.html.diff
 import lxml.etree
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 
 import sys, io
 
@@ -21,11 +21,26 @@ def tokenizeDoc(doc: DocID, index: dict) -> [(str, int)]:
 		htmlFile = open(doc.getPath())
 		print("HALLO")
 		soup = BeautifulSoup(htmlFile, 'lxml')
+		comments=soup.find_all(string=lambda text:isinstance(text,Comment))
 		# print(soup.find_all('img'))
 		# print(soup.children)
 		for i in soup.descendants:
-			# print(i.name)
+			print(i.name)
+			print('\n-------\n')
+
+			if i.name == None:
+				if i in comments:
+					print("Found a comment")
+				else:
+					print("Found some text-not comment")
+				#At text content, can start getting data. 
+				# COULD start considering parents i.parent.name == h1 -> Better to do it before?
+			elif i.name == 'img':
+				#Found an image, add to image index
+				pass
+			print('\n-------\n')
 			print(i)
+			print('\n-------\n')
 			# print(repr(i))
 			# print(type(i))
 	except:
@@ -47,6 +62,7 @@ def prettyPrintIndex(index: dict):
 def main(index: dict):
 	for l in interact_files.readFromBook():
 		d = DocID(l)
+		print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
 		if d.getID() in index:
 			continue
 		else:
