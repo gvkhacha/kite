@@ -34,8 +34,6 @@ class Tokenizer:
 
 	def findAllTokens(self):
 		for element in self._soup.descendants:
-			print(element.name)
-			print('\n-------\n')
 			if element.name == None:
 				if element in self._comments:
 					print("Found a comment!")
@@ -70,22 +68,30 @@ class Tokenizer:
 			self._imgIndex[key].append(val)
 
 	def _determineText(self, element):
+		"""Determine the weight of the text found, send to another method to 
+		add to dictionary"""
 		parents = list(element.parents)
-		weight = 0
-		# print('Found text\n\tPARENTS:')
-		# for i in parents:
-		# 	print(i.name)
-		if 'p' in parents:
-			# print("JUST PARAGRAPH")
-			# print('\t{}'.format(element))
-			# print("PARAGRAPH END")
-			self._addTextToIndex(element, 2)
-		elif any([HEADERS.match(i.name) for i  in parents]):
-			# print("THIS IS IMPORTANT!!!!")
-			# print(element)
-			# print('DONE IMPORTANT')
-			self._addTextToIndex(element, 2)
+		weight = 1
+		if any([HEADERS.match(i.name) for i  in parents]):
+			weight = 2
+
+		self._addTextToIndex(element, weight)
+
 	def _addTextToIndex(self, text, weight):
 		"""Takes the text, tokenizes with language changes and number differences"""
-		for token in text.split():
-			self._index[token].append( (self._doc.getID(), weight) )
+		matches = re.findall(r'\w+', text.lower())
+		val = (self._doc.getID(), weight)
+		for i in range(len(matches)):
+			try:
+				int(matches[i])
+				if i != 0:
+					prev = "{} {}".format(matches[i-1], matches[i]).lower()
+					self._index[prev].append( val )
+				if i != len(matches) - 1:
+					after = "{} {}".format(matches[i], matches[i+1]).lower()
+					self._index[after].append( val )
+
+			except ValueError:
+				# It's not a number...
+				# For now, just simple tokenize and add to index
+				self._index[matches[i]].append( val ) 
