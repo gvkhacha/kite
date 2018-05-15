@@ -3,7 +3,7 @@ from collections import defaultdict
 from bs4 import BeautifulSoup, Comment
 import re
 
-IMPORTANT = re.compile('h[1-6]') #to add more later
+HEADERS = re.compile('h[1-6]') #to add more later
 
 class DocID:
 	def __init__(self, bookentry: str):
@@ -40,7 +40,7 @@ class Tokenizer:
 				if element in self._comments:
 					print("Found a comment!")
 				else:
-					self._addText(element)
+					self._determineText(element)
 			elif element.name == 'img':
 				self._addImage(element)
 
@@ -61,16 +61,26 @@ class Tokenizer:
 
 		key = (self._title, alt)
 		val = (self._rootURL + element['src'], len(list(element.parents)) * 0.22)
-		self._imgIndex[key].append(val)
+		if key not in self._imgIndex:
+			self._imgIndex[key].append(val)
 
-	def _addText(self, element):
+	def _determineText(self, element):
 		parents = list(element.parents)
 		weight = 0
-		print('Found text\n\tPARENTS:')
-		for i in parents:
-			print(i.name)
+		# print('Found text\n\tPARENTS:')
+		# for i in parents:
+		# 	print(i.name)
 		if 'p' in parents:
-			print('\t{}'.format(element))
-		elif any([IMPORTANT.match(i.name) for i  in parents]):
-			print("THIS IS IMPORTANT!!!!")
-			print(element)
+			# print("JUST PARAGRAPH")
+			# print('\t{}'.format(element))
+			# print("PARAGRAPH END")
+			self._addTextToIndex(element, 2)
+		elif any([HEADERS.match(i.name) for i  in parents]):
+			# print("THIS IS IMPORTANT!!!!")
+			# print(element)
+			# print('DONE IMPORTANT')
+			self._addTextToIndex(element, 2)
+	def _addTextToIndex(self, text, weight):
+		"""Takes the text, tokenizes with language changes and number differences"""
+		for token in text.split():
+			self._index[token].append( (self._doc.getID(), weight) )
