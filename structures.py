@@ -1,7 +1,9 @@
-from html.parser import HTMLParser
-from collections import defaultdict
 from bs4 import BeautifulSoup, Comment
+from nltk.stem.wordnet import WordNetLemmatizer
+
 import re
+
+lmtzr = WordNetLemmatizer() #Not sure, but probably better to init once.
 
 HEADERS = re.compile('h[1-6]') #to add more later
 
@@ -93,5 +95,6 @@ class Tokenizer:
 
 			except ValueError:
 				# It's not a number...
-				# For now, just simple tokenize and add to index
-				self._index[matches[i]].append( val ) 
+				# Lemmatizing first, not sure if thats best option yet.
+
+				self._index[lmtzr.lemmatize(matches[i])].append( val ) 
