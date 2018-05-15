@@ -60,7 +60,12 @@ class Tokenizer:
 			alt = ''
 
 		key = (self._title, alt)
-		val = (self._rootURL + element['src'], len(list(element.parents)) * 0.22)
+		src = element['src']
+		if src.startswith('/'):
+			baseURL = self._rootURL.split('/')[0]
+		else:
+			baseURL = self._rootURL
+		val = (baseURL + element['src'], len(list(element.parents)) * 0.22)
 		if key not in self._imgIndex:
 			self._imgIndex[key].append(val)
 
