@@ -38,7 +38,8 @@ class Tokenizer:
 		for element in self._soup.descendants:
 			if element.name == None:
 				if element in self._comments:
-					print("Found a comment!")
+					# print("Found a comment!")
+					pass
 				else:
 					self._determineText(element)
 			elif element.name == 'img':
@@ -55,17 +56,24 @@ class Tokenizer:
 		self._rootURL = '/'.join(root) + '/'	
 
 	def _addImage(self, element):
+		try:
+			src = element['src']
+		except KeyError:
+			#For some reason, img doesn't have src attr *cough* WICS *cough*
+			return
 		alt = element.get('alt')
 		if alt == None:
 			alt = ''
-
+		alt = alt.split('•')[0]
 		key = (self._title, alt)
-		src = element['src']
+
 		if src.startswith('/'):
-			baseURL = self._rootURL.split('/')[0]
+			srcURL = self._rootURL.split('/')[0] + element['src']
+		elif 'http' in src:
+			srcURL = src
 		else:
-			baseURL = self._rootURL
-		val = (baseURL + element['src'], len(list(element.parents)) * 0.22)
+			srcURL = self._rootURL + element['src']
+		val = (srcURL, len(list(element.parents)) * 0.22)
 		if key not in self._imgIndex:
 			self._imgIndex[key].append(val)
 

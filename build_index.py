@@ -17,8 +17,6 @@ def tokenizeDoc(doc: DocID, index: dict, imgIndex: dict) -> None:
 	t.findAllTokens()
 
 
-
-
 def _prettyPrintIndex(index: dict):
 	for doc, postings in index.items():
 		print("{}: ".format(doc))
@@ -42,8 +40,8 @@ def main(index: dict, imgIndex: dict):
 			continue
 		else:
 			tokenizeDoc(d, index, imgIndex)
-	_prettyPrintIndex(index)
-	print('\n\n')
+	# _prettyPrintIndex(index)
+	# print('\n\n')
 	_prettyPrintImgIndex(imgIndex)
 
 
