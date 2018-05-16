@@ -26,9 +26,9 @@ class DocID:
 		return self._filepath
 
 class Tokenizer:
-	def __init__(self, doc: DocID, index: dict, imgIndex: dict):
+	def __init__(self, doc: DocID, tokens: list, imgIndex: dict):
 		self._doc = doc
-		self._index = index
+		self._tokens = tokens
 		self._imgIndex = imgIndex
 		with open(self._doc.getPath()) as htmlFile:
 			self._soup = BeautifulSoup(htmlFile, 'lxml')
@@ -44,6 +44,24 @@ class Tokenizer:
 					self._determineText(element)
 			elif element.name == 'img':
 				self._addImage(element)
+
+	def addTokensToIndex(self, index: dict):
+		"""Takes text tokens found in self._tokens and adds to index:
+		self._tokens : [(token, docID, weight )]
+		index: {token: [(docID, weight)]} with no duplicates
+		index is defaultdict[list] -> can append any time
+		"""
+		for token, docid, weight in self._tokens:
+			if token in index:
+				for i in range(len(index[token])): #pair = (docID, weight) already in index
+					pair = index[token][i]
+					if pair[0] == docid:
+						index[token][i] = (docid, weight + pair[1])
+					else:
+						index[token].append((docid, weight))		
+			else:
+				index[token].append((docid, weight))
+
 
 	def _getDocData(self):
 		self._comments = self._soup.find_all(string=lambda text:isinstance(text,Comment))
@@ -90,19 +108,20 @@ class Tokenizer:
 	def _addTextToIndex(self, text, weight):
 		"""Takes the text, tokenizes with language changes and number differences"""
 		matches = re.findall(r'\w+', text.lower())
-		val = (self._doc.getID(), weight)
 		for i in range(len(matches)):
 			try:
 				int(matches[i])
 				if i != 0:
 					prev = "{} {}".format(matches[i-1], matches[i]).lower()
-					self._index[prev].append( val )
+					self._tokens.append( (prev, self._doc.getID(), weight) )
+					# self._index[prev].append( val )
 				if i != len(matches) - 1:
 					after = "{} {}".format(matches[i], matches[i+1]).lower()
-					self._index[after].append( val )
+					self._tokens.append( (after, self._doc.getID(), weight) )
+					# self._index[after].append( val )
 
 			except ValueError:
 				# It's not a number...
 				# Lemmatizing first, not sure if thats best option yet.
-
-				self._index[lmtzr.lemmatize(matches[i])].append( val ) 
+				self._tokens.append( (lmtzr.lemmatize(matches[i]), self._doc.getID(), weight) )
+				# self._index[lmtzr.lemmatize(matches[i])].append( val ) 

@@ -9,19 +9,21 @@ import lxml.etree
 import sys, io
 
 
-def tokenizeDoc(doc: DocID, index: dict, imgIndex: dict) -> None:
+def tokenizeDoc(doc: DocID, tokensList: list, index: dict, imgIndex: dict) -> None:
 	""" Reads document's file and parses through tokens
 	For now, only considers occurances
 	"""
-	t = Tokenizer(doc, index, imgIndex)
+	t = Tokenizer(doc, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
 	t.findAllTokens()
+	print(tokensList)
+	t.addTokensToIndex(index)
 
 
 def _prettyPrintIndex(index: dict):
-	for doc, postings in index.items():
-		print("{}: ".format(doc))
-		for token, count in postings:
-			print("\t{} : {}".format(token, count))
+	for token, postings in index.items():
+		print("{}".format(token))
+		for i, k in postings:
+			print("\t{}: {}".format(i, k))
 
 
 def _prettyPrintImgIndex(index: dict):
@@ -32,17 +34,17 @@ def _prettyPrintImgIndex(index: dict):
 			print("\t{} : {}".format(url, priority))
 
 
-def main(index: dict, imgIndex: dict):
+def main(tokensList: list, index: dict, imgIndex: dict):
 	for l in interact_files.readFromBook():
 		d = DocID(l)
 		print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
 		if d.getID() in index:
 			continue
 		else:
-			tokenizeDoc(d, index, imgIndex)
-	# _prettyPrintIndex(index)
+			tokenizeDoc(d, tokensList, index, imgIndex)
+	_prettyPrintIndex(index)
 	# print('\n\n')
-	_prettyPrintImgIndex(imgIndex)
+	# _prettyPrintImgIndex(imgIndex)
 
 
 if __name__ == '__main__':
@@ -50,6 +52,7 @@ if __name__ == '__main__':
 		index = interact_files.loadIndexFromFile('main')
 		imgIndex = interact_files.loadIndexFromFile('img')
 	elif sys.argv[1] in {'-r', 'reload'}:
+		tokensList = [] # [(token, docID, priority)]
 		index = defaultdict(list) # {token : [(docID, priority)]}
 		imgIndex = defaultdict(list) # {(title, imgAlt): [(srcurl, priority)]}
 		interact_files.resetIndexFiles()
@@ -57,7 +60,7 @@ if __name__ == '__main__':
 		raise Warning("Invalid command line input")
 
 	try:
-		main(index, imgIndex)
+		main(tokensList, index, imgIndex)
 	except KeyboardInterrupt:
 		pass
 	finally:
