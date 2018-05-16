@@ -6,8 +6,9 @@ import interact_files
 import lxml.html.diff
 import lxml.etree
 
-import sys, io
+import sys, io, time
 
+ANALYTICS = dict()
 
 def addTokensToIndex(tokens: list, index: dict):
 	"""Takes text tokens found in self._tokens and adds to index:
@@ -47,21 +48,35 @@ def _prettyPrintImgIndex(index: dict):
 
 def main(index: dict, imgIndex: dict):
 	try:
+		docCountPrev = 0
+		docCountCont = 0
+		searchTime = time.time()
 		tokensList = [] # [(token, docID, priority)]
 		for l in interact_files.readFromBook():
 			d = DocID(l)
 			# print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
 			if d.getID() in index:
+				docCountPrev += 1
 				continue
 			else:
+				docCountCont += 1
 				t = Tokenizer(d, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
 				t.findAllTokens()
 	except KeyboardInterrupt:
 		print("Keyboard Interrupt. Writing files and shutting down.")
 	finally:
+		ANALYTICS['searchTime'] = time.time() - searchTime
+		ANALYTICS['docCountPrev'] = docCountPrev
+		ANALYTICS['docCountCont'] = docCountCont
+		tokenTime = time.time()
 		addTokensToIndex(tokensList, index)
+		ANALYTICS['tokenTime'] = time.time() - tokenTime
+		saveTime = time.time()
 		interact_files.saveIndexToFile(index, 'main')
 		interact_files.saveIndexToFile(imgIndex, 'img')
+		ANALYTICS['saveTime'] = time.time() - saveTime
+		for i, k in ANALYTICS.items():
+			print("{} : {}".format(i, k))
 	# _prettyPrintIndex(index)
 	# print('\n\n')
 	# _prettyPrintImgIndex(imgIndex)
@@ -69,8 +84,12 @@ def main(index: dict, imgIndex: dict):
 
 if __name__ == '__main__':
 	if len(sys.argv) == 1:
+		loadTime = time.time()
 		index = interact_files.loadIndexFromFile('main')
 		imgIndex = interact_files.loadIndexFromFile('img')
+
+		ANALYTICS['load'] = time.time() - loadTime
+
 	elif sys.argv[1] in {'-r', 'reload'}:
 		""" Index isn't necessarily needed until we need to merge...Maybe better to keep it
 		out of memory, but either way is okay"""
