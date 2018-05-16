@@ -15,8 +15,31 @@ def tokenizeDoc(doc: DocID, tokensList: list, index: dict, imgIndex: dict) -> No
 	"""
 	t = Tokenizer(doc, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
 	t.findAllTokens()
-	for i, k, v in tokensList:
-		print("{}: {}: {}".format(i, k, v))
+
+
+def addTokensToIndex(tokens: list, index: dict):
+	"""Takes text tokens found in self._tokens and adds to index:
+	tokens : [(token, docID, weight )]
+	index: {token: [(docID, weight)]} with no duplicates
+	index is defaultdict[list] -> can append any time
+	"""
+	for token, docid, weight in tokens:
+		# print("{}\n\t{}\t{}".format(token, docid, weight))
+		if token in index.keys():
+			found = False
+			for i in range(len(index[token])):
+				if index[token][i][0] == docid:
+					found = True
+					index[token][i] = (docid, index[token][i][1] + weight)
+			if not found:
+				# print("CURRENT TOKEN:\n\t{}: {}: {}".format(token, docid, weight))
+				# print("CURRENT LIST: {}".format(index[token]))
+				index[token].append((docid, weight))
+				# else:
+				# 	index[token].append((docid, weight))
+		else:
+			index[token].append((docid, weight))
+
 
 def _prettyPrintIndex(index: dict):
 	for token, postings in index.items():
@@ -41,6 +64,8 @@ def main(tokensList: list, index: dict, imgIndex: dict):
 			continue
 		else:
 			tokenizeDoc(d, tokensList, index, imgIndex)
+
+	addTokensToIndex(tokensList, index)
 	_prettyPrintIndex(index)
 	# print('\n\n')
 	# _prettyPrintImgIndex(imgIndex)
