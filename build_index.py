@@ -9,7 +9,7 @@ import lxml.etree
 import sys, io
 
 
-def tokenizeDoc(doc: DocID, tokensList: list, index: dict, imgIndex: dict) -> None:
+def tokenizeDoc(doc: DocID, tokensList: list, imgIndex: dict) -> None:
 	""" Reads document's file and parses through tokens
 	For now, only considers occurances
 	"""
@@ -24,19 +24,16 @@ def addTokensToIndex(tokens: list, index: dict):
 	index is defaultdict[list] -> can append any time
 	"""
 	for token, docid, weight in tokens:
-		# print("{}\n\t{}\t{}".format(token, docid, weight))
 		if token in index.keys():
 			found = False
 			for i in range(len(index[token])):
 				if index[token][i][0] == docid:
+					#If the same (token, docID) is in the index, add the weight
 					found = True
 					index[token][i] = (docid, index[token][i][1] + weight)
 			if not found:
-				# print("CURRENT TOKEN:\n\t{}: {}: {}".format(token, docid, weight))
-				# print("CURRENT LIST: {}".format(index[token]))
+				#If it was not found, add it raw
 				index[token].append((docid, weight))
-				# else:
-				# 	index[token].append((docid, weight))
 		else:
 			index[token].append((docid, weight))
 
@@ -63,7 +60,7 @@ def main(tokensList: list, index: dict, imgIndex: dict):
 		if d.getID() in index:
 			continue
 		else:
-			tokenizeDoc(d, tokensList, index, imgIndex)
+			tokenizeDoc(d, tokensList, imgIndex)
 
 	addTokensToIndex(tokensList, index)
 	_prettyPrintIndex(index)
@@ -77,6 +74,8 @@ if __name__ == '__main__':
 		imgIndex = interact_files.loadIndexFromFile('img')
 	elif sys.argv[1] in {'-r', 'reload'}:
 		tokensList = [] # [(token, docID, priority)]
+		""" Index isn't necessarily needed until we need to merge...Maybe better to keep it
+		out of memory, but either way is okay"""
 		index = defaultdict(list) # {token : [(docID, priority)]}
 		imgIndex = defaultdict(list) # {(title, imgAlt): [(srcurl, priority)]}
 		interact_files.resetIndexFiles()
