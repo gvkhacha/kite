@@ -46,18 +46,23 @@ def _prettyPrintImgIndex(index: dict):
 
 
 def main(index: dict, imgIndex: dict):
-	tokensList = [] # [(token, docID, priority)]
-	for l in interact_files.readFromBook():
-		d = DocID(l)
-		# print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
-		if d.getID() in index:
-			continue
-		else:
-			t = Tokenizer(d, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
-			t.findAllTokens()
-
-	addTokensToIndex(tokensList, index)
-	_prettyPrintIndex(index)
+	try:
+		tokensList = [] # [(token, docID, priority)]
+		for l in interact_files.readFromBook():
+			d = DocID(l)
+			# print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
+			if d.getID() in index:
+				continue
+			else:
+				t = Tokenizer(d, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
+				t.findAllTokens()
+	except KeyboardInterrupt:
+		print("Keyboard Interrupt. Writing files and shutting down.")
+	finally:
+		addTokensToIndex(tokensList, index)
+		interact_files.saveIndexToFile(index, 'main')
+		interact_files.saveIndexToFile(imgIndex, 'img')
+	# _prettyPrintIndex(index)
 	# print('\n\n')
 	# _prettyPrintImgIndex(imgIndex)
 
@@ -75,10 +80,11 @@ if __name__ == '__main__':
 	else:
 		raise Warning("Invalid command line input")
 
-	try:
-		main(index, imgIndex)
-	except KeyboardInterrupt:
-		pass
-	finally:
-		interact_files.saveIndexToFile(index, 'main')
-		interact_files.saveIndexToFile(imgIndex, 'img')
+	main(index, imgIndex)
+	# try:
+	# 	main(index, imgIndex)
+	# except KeyboardInterrupt:
+	# 	pass
+	# finally:
+	# 	interact_files.saveIndexToFile(index, 'main')
+	# 	interact_files.saveIndexToFile(imgIndex, 'img')
