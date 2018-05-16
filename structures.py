@@ -82,8 +82,12 @@ class Tokenizer:
 		add to dictionary"""
 		parents = list(element.parents)
 		weight = 1
-		if any([HEADERS.match(i.name) for i  in parents]):
+		parentTags = [i.name for i in parents]
+		if any([HEADERS.match(tag) for tag in parentTags]):
 			weight = 2
+		if 'script' in parentTags or 'style' in parentTags:
+			# Text is in a script, can ignore
+			return
 
 		self._addTextToIndex(element, weight)
 

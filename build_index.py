@@ -57,7 +57,7 @@ def main(index: dict, imgIndex: dict):
 	tokensList = [] # [(token, docID, priority)]
 	for l in interact_files.readFromBook():
 		d = DocID(l)
-		print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
+		# print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
 		if d.getID() in index:
 			continue
 		else:
