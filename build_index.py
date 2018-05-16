@@ -9,14 +9,6 @@ import lxml.etree
 import sys, io
 
 
-def tokenizeDoc(doc: DocID, tokensList: list, imgIndex: dict) -> None:
-	""" Reads document's file and parses through tokens
-	For now, only considers occurances
-	"""
-	t = Tokenizer(doc, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
-	t.findAllTokens()
-
-
 def addTokensToIndex(tokens: list, index: dict):
 	"""Takes text tokens found in self._tokens and adds to index:
 	tokens : [(token, docID, weight )]
@@ -61,7 +53,8 @@ def main(index: dict, imgIndex: dict):
 		if d.getID() in index:
 			continue
 		else:
-			tokenizeDoc(d, tokensList, imgIndex)
+			t = Tokenizer(d, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
+			t.findAllTokens()
 
 	addTokensToIndex(tokensList, index)
 	_prettyPrintIndex(index)
