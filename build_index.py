@@ -15,9 +15,8 @@ def tokenizeDoc(doc: DocID, tokensList: list, index: dict, imgIndex: dict) -> No
 	"""
 	t = Tokenizer(doc, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
 	t.findAllTokens()
-	print(tokensList)
-	t.addTokensToIndex(index)
-
+	for i, k, v in tokensList:
+		print("{}: {}: {}".format(i, k, v))
 
 def _prettyPrintIndex(index: dict):
 	for token, postings in index.items():

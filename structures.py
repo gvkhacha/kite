@@ -45,24 +45,6 @@ class Tokenizer:
 			elif element.name == 'img':
 				self._addImage(element)
 
-	def addTokensToIndex(self, index: dict):
-		"""Takes text tokens found in self._tokens and adds to index:
-		self._tokens : [(token, docID, weight )]
-		index: {token: [(docID, weight)]} with no duplicates
-		index is defaultdict[list] -> can append any time
-		"""
-		for token, docid, weight in self._tokens:
-			if token in index:
-				for i in range(len(index[token])): #pair = (docID, weight) already in index
-					pair = index[token][i]
-					if pair[0] == docid:
-						index[token][i] = (docid, weight + pair[1])
-					else:
-						index[token].append((docid, weight))		
-			else:
-				index[token].append((docid, weight))
-
-
 	def _getDocData(self):
 		self._comments = self._soup.find_all(string=lambda text:isinstance(text,Comment))
 		self._title = self._soup.title
