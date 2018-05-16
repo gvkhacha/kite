@@ -51,13 +51,15 @@ def main(index: dict, imgIndex: dict):
 		docCountPrev = 0
 		docCountCont = 0
 		searchTime = time.time()
+
+		contPoint = index.get('& LAST DOC &', 0)
 		tokensList = [] # [(token, docID, priority)]
 		for l in interact_files.readFromBook():
 			d = DocID(l)
 			# print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
-			if d.getID() in index:
+			if docCountCont < contPoint:
 				docCountPrev += 1
-				continue
+				docCountCont += 1
 			else:
 				docCountCont += 1
 				t = Tokenizer(d, tokensList, imgIndex) #Tokenizer adds to tokenslist and imgindex
@@ -67,13 +69,20 @@ def main(index: dict, imgIndex: dict):
 	finally:
 		ANALYTICS['searchTime'] = time.time() - searchTime
 		ANALYTICS['docCountPrev'] = docCountPrev
-		ANALYTICS['docCountCont'] = docCountCont
+		ANALYTICS['docCountCont'] = docCountCont - docCountPrev
 		tokenTime = time.time()
+
+
 		addTokensToIndex(tokensList, index)
+
 		ANALYTICS['tokenTime'] = time.time() - tokenTime
 		saveTime = time.time()
+
+		index['& LAST DOC &'] = docCountCont
 		interact_files.saveIndexToFile(index, 'main')
 		interact_files.saveIndexToFile(imgIndex, 'img')
+
+
 		ANALYTICS['saveTime'] = time.time() - saveTime
 		for i, k in ANALYTICS.items():
 			print("{} : {}".format(i, k))
