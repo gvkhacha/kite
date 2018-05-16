@@ -96,14 +96,13 @@ class Tokenizer:
 				if i != 0:
 					prev = "{} {}".format(matches[i-1], matches[i]).lower()
 					self._tokens.append( (prev, self._doc.getID(), weight) )
-					# self._index[prev].append( val )
 				if i != len(matches) - 1:
 					after = "{} {}".format(matches[i], matches[i+1]).lower()
 					self._tokens.append( (after, self._doc.getID(), weight) )
-					# self._index[after].append( val )
 
 			except ValueError:
 				# It's not a number...
 				# Lemmatizing first, not sure if thats best option yet.
-				self._tokens.append( (lmtzr.lemmatize(matches[i]), self._doc.getID(), weight) )
-				# self._index[lmtzr.lemmatize(matches[i])].append( val ) 
+				# self._tokens.append( (lmtzr.lemmatize(matches[i]), self._doc.getID(), weight) )
+				# Removing lemmatization for now				
+				self._tokens.append( ((matches[i], self._doc.getID(), weight))) 

@@ -53,7 +53,8 @@ def _prettyPrintImgIndex(index: dict):
 			print("\t{} : {}".format(url, priority))
 
 
-def main(tokensList: list, index: dict, imgIndex: dict):
+def main(index: dict, imgIndex: dict):
+	tokensList = [] # [(token, docID, priority)]
 	for l in interact_files.readFromBook():
 		d = DocID(l)
 		print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
@@ -73,7 +74,6 @@ if __name__ == '__main__':
 		index = interact_files.loadIndexFromFile('main')
 		imgIndex = interact_files.loadIndexFromFile('img')
 	elif sys.argv[1] in {'-r', 'reload'}:
-		tokensList = [] # [(token, docID, priority)]
 		""" Index isn't necessarily needed until we need to merge...Maybe better to keep it
 		out of memory, but either way is okay"""
 		index = defaultdict(list) # {token : [(docID, priority)]}
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 		raise Warning("Invalid command line input")
 
 	try:
-		main(tokensList, index, imgIndex)
+		main(index, imgIndex)
 	except KeyboardInterrupt:
 		pass
 	finally:
