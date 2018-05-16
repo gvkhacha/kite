@@ -67,6 +67,7 @@ def main(index: dict, imgIndex: dict):
 	except KeyboardInterrupt:
 		print("Keyboard Interrupt. Writing files and shutting down.")
 	finally:
+		print("Finishing program. Do not shut down.")
 		ANALYTICS['searchTime'] = time.time() - searchTime
 		ANALYTICS['docCountPrev'] = docCountPrev
 		ANALYTICS['docCountCont'] = docCountCont - docCountPrev
