@@ -41,7 +41,7 @@ class Tokenizer:
 					# print("Found a comment!")
 					pass
 				else:
-					self._determineText(element)
+					self._determineTextWeight(element)
 			elif element.name == 'img':
 				self._addImage(element)
 
@@ -73,11 +73,11 @@ class Tokenizer:
 			srcURL = src
 		else:
 			srcURL = self._rootURL + element['src']
-		val = (srcURL, len(list(element.parents)) * 0.22)
+		val = (srcURL, len(list(element.parents)) * 0.22) #If there are a lot of parents, img is buried/likely not as important
 		if key not in self._imgIndex:
 			self._imgIndex[key].append(val)
 
-	def _determineText(self, element):
+	def _determineTextWeight(self, element):
 		"""Determine the weight of the text found, send to another method to 
 		add to dictionary"""
 		parents = list(element.parents)
@@ -89,24 +89,40 @@ class Tokenizer:
 			# Text is in a script, can ignore
 			return
 
-		self._addTextToIndex(element, weight)
+		toAdd = self._modifyText(element, weight)
+		self._addTokens(toAdd)
 
-	def _addTextToIndex(self, text, weight):
-		"""Takes the text, tokenizes with language changes and number differences"""
+	def _modifyText(self, text, weight) -> [tuple]:
+		"""Takes the text, tokenizes with language changes and number differences
+		returns a list of (token, docID, weight) tuples"""
+		result = []
 		matches = re.findall(r'\w+', text.lower())
 		for i in range(len(matches)):
 			try:
 				int(matches[i])
 				if i != 0:
 					prev = "{} {}".format(matches[i-1], matches[i]).lower()
-					self._tokens.append( (prev, self._doc.getID(), weight) )
+					result.append( (prev, self._doc.getID(), weight) )
 				if i != len(matches) - 1:
 					after = "{} {}".format(matches[i], matches[i+1]).lower()
-					self._tokens.append( (after, self._doc.getID(), weight) )
+					result.append( (after, self._doc.getID(), weight) )
 
 			except ValueError:
 				# It's not a number...
 				# Lemmatizing first, not sure if thats best option yet.
 				# self._tokens.append( (lmtzr.lemmatize(matches[i]), self._doc.getID(), weight) )
-				# Removing lemmatization for now				
-				self._tokens.append( ((matches[i], self._doc.getID(), weight))) 
+				# Removing lemmatization for now		
+				result.append( ((matches[i], self._doc.getID(), weight))) 
+		return result
+
+	def _addTokens(self, toAdd: list) -> None:
+		""" Takes a list of (token, docID, weight) pairs and adds them all to a tokens list while considering
+		duplicate token, docID and just adding weight"""
+		for tok, doc, weight in toAdd:
+			found = False
+			for i in range(len(self._tokens)):
+				if self._tokens[i][0] == tok and self._tokens[i][1] == doc:
+					self._tokens[i] = (tok, doc, self._tokens[i][2] + weight)
+					found = True
+			if not found:
+				self._tokens.append((tok, doc, weight))

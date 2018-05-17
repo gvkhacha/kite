@@ -73,7 +73,6 @@ def main(index: dict, imgIndex: dict):
 		ANALYTICS['docCountCont'] = docCountCont - docCountPrev
 		tokenTime = time.time()
 
-
 		addTokensToIndex(tokensList, index)
 
 		ANALYTICS['tokenTime'] = time.time() - tokenTime
@@ -110,10 +109,3 @@ if __name__ == '__main__':
 		raise Warning("Invalid command line input")
 
 	main(index, imgIndex)
-	# try:
-	# 	main(index, imgIndex)
-	# except KeyboardInterrupt:
-	# 	pass
-	# finally:
-	# 	interact_files.saveIndexToFile(index, 'main')
-	# 	interact_files.saveIndexToFile(imgIndex, 'img')
