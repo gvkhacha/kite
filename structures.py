@@ -85,6 +85,8 @@ class Tokenizer:
 			if h in parentTags:
 				weight = int(100/int(h[-1]))
 				break				
+		if 'title' in parentTags:
+			weight = 130
 		if 'script' in parentTags or 'style' in parentTags:
 			# Text is in a script, can ignore
 			return
