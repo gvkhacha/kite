@@ -1,5 +1,5 @@
 from structures import DocID, Tokenizer
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 import interact_files
 
@@ -17,18 +17,20 @@ def addTokensToIndex(tokens: list, index: dict):
 	index is defaultdict[list] -> can append any time
 	"""
 	for token, docid, weight in tokens:
-		if token in index.keys():
-			found = False
-			for i in range(len(index[token])):
-				if index[token][i][0] == docid:
-					#If the same (token, docID) is in the index, add the weight
-					found = True
-					index[token][i] = (docid, index[token][i][1] + weight)
-			if not found:
-				#If it was not found, add it raw
-				index[token].append((docid, weight))
-		else:
-			index[token].append((docid, weight))
+		index[token][docid] += weight
+	# for token, docid, weight in tokens:
+	# 	if token in index.keys():
+	# 		found = False
+	# 		for i in range(len(index[token])):
+	# 			if index[token][i][0] == docid:
+	# 				#If the same (token, docID) is in the index, add the weight
+	# 				found = True
+	# 				index[token][i] = (docid, index[token][i][1] + weight)
+	# 		if not found:
+	# 			#If it was not found, add it raw
+	# 			index[token].append((docid, weight))
+	# 	else:
+	# 		index[token].append((docid, weight))
 
 
 def _prettyPrintIndex(index: dict):
@@ -103,7 +105,7 @@ if __name__ == '__main__':
 	elif sys.argv[1] in {'-r', 'reload'}:
 		""" Index isn't necessarily needed until we need to merge...Maybe better to keep it
 		out of memory, but either way is okay"""
-		index = defaultdict(list) # {token : [(docID, priority)]}
+		index = defaultdict(Counter) # {token : [(docID, priority)]}
 		imgIndex = defaultdict(list) # {(title, imgAlt): [(srcurl, priority)]}
 		interact_files.resetIndexFiles()
 	else:

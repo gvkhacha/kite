@@ -15,7 +15,7 @@ class DocID:
 		self._ID = tuple(rawEntry[0].split('/'))
 		self._URL = rawEntry[1]
 		self._filepath = 'WEBPAGES_RAW/' + rawEntry[0]
-
+		
 	def getID(self) -> (str, str):
 		return self._ID
 
