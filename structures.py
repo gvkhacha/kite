@@ -5,8 +5,6 @@ import re
 
 lmtzr = WordNetLemmatizer() #Not sure, but probably better to init once.
 
-HEADERS = re.compile('h[1-6]') #to add more later
-
 class DocID:
 	def __init__(self, bookentry: str):
 		""" Bookentry is the egntry inside bookkeeping.json
@@ -83,8 +81,10 @@ class Tokenizer:
 		parents = list(element.parents)
 		weight = 1
 		parentTags = [i.name for i in parents]
-		if any([HEADERS.match(tag) for tag in parentTags]):
-			weight = 2
+		for h in ['h1','h2','h3','h4','h5','h6']:
+			if h in parentTags:
+				weight = int(100/int(h[-1]))
+				break				
 		if 'script' in parentTags or 'style' in parentTags:
 			# Text is in a script, can ignore
 			return
