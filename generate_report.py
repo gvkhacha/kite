@@ -24,7 +24,7 @@ def searchIndex(index: dict, docs: dict, queries: [str]) -> None:
 		print("{:^36}".format("Search for " + q))
 		print("="*36)
 		counter = 1
-		results = search.query(index, q)
+		results = search.searchIndex(index, q)
 		for r in results:
 			print("{}. DocID: {}, Score: {}".format(counter, r[0], r[1]))
 			counter += 1

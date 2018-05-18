@@ -2,3 +2,4 @@ __pycache__/
 WEBPAGES_RAW/
 *.pickle
 *.pickle.bak
+report.txt
