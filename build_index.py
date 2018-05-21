@@ -12,26 +12,10 @@ def addTokensToIndex(tokens: list, index: dict):
 	"""Takes text tokens found in self._tokens and adds to index:
 	tokens : [(token, docID, weight )]
 	index: {token: [(docID, weight)]} with no duplicates
-	index is defaultdict[list] -> can append any time
+	index is defaultdict[Counter] -> can add any time
 	"""
 	for token, docid, weight in tokens:
 		index[token][DTRANS[docid]] += weight
-
-
-def _prettyPrintIndex(index: dict):
-	for token, postings in index.items():
-		print("{}".format(token))
-		for i, k in postings:
-			print("\t{}: {}".format(i, k))
-
-
-def _prettyPrintImgIndex(index: dict):
-	for tup, postings in index.items():
-		title, alt = tup
-		print("{}, {}".format(title, alt))
-		for url, priority in postings:
-			print("\t{} : {}".format(url, priority))
-
 
 def main(index: dict, imgIndex: dict):
 	try:
@@ -75,9 +59,6 @@ def main(index: dict, imgIndex: dict):
 		ANALYTICS['saveTime'] = time.time() - saveTime
 		for i, k in ANALYTICS.items():
 			print("{} : {}".format(i, k))
-	# _prettyPrintIndex(index)
-	# print('\n\n')
-	# _prettyPrintImgIndex(imgIndex)
 
 
 if __name__ == '__main__':
@@ -91,17 +72,10 @@ if __name__ == '__main__':
 	elif sys.argv[1] in {'-r', 'reload'}:
 		""" Index isn't necessarily needed until we need to merge...Maybe better to keep it
 		out of memory, but either way is okay"""
-		index = defaultdict(Counter) # {token : [(docID, priority)]}
+		index = defaultdict(Counter) # {token : {docID: priority} }
 		imgIndex = defaultdict(list) # {(title, imgAlt): [(srcurl, priority)]}
 		interact_files.resetIndexFiles()
 	else:
 		raise Warning("Invalid command line input")
 
 	main(index, imgIndex)
-	# try:
-	# 	main(index, imgIndex)
-	# except KeyboardInterrupt:
-	# 	pass
-	# finally:
-	# 	interact_files.saveIndexToFile(index, 'main')
-	# 	interact_files.saveIndexToFile(imgIndex, 'img')
