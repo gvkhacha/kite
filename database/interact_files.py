@@ -17,7 +17,7 @@ def readFromBook():
 def saveIndexToFile(index: dict, indexType='main') -> None:
 	"""Saves any object (index) to ./database/TYPE_index.pickle"""
 	try:
-		with open('database/{}_index.pickle', 'wb') as file:
+		with open('database/{}_index.pickle'.format(indexType), 'wb') as file:
 			pickle.dump(index, file, protocol=pickle.HIGHEST_PROTOCOL)
 	except:
 		raise #re-raise fo rnow.
@@ -26,7 +26,7 @@ def loadIndexFromFile(indexType='main') -> dict:
 	""" Loads and returns and object from pickled file in previous
 	format - ./database/TYPE_index.pickle"""
 	try:
-		with open('database/{}_index.pickle', 'rb') as file:
+		with open('database/{}_index.pickle'.format(indexType), 'rb') as file:
 			return pickle.load(file)
 	except:
 		raise #re-raise for now.
