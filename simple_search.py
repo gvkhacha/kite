@@ -37,15 +37,15 @@ def getDocIDs() -> dict:
 
 def main():
 	index = interact_files.loadIndexFromFile('main')
-	docs = getDocIDs()
 
 
 	q = input("Give me a search query: ")
 	while q != '':
 		results = searchIndex(index, q)
 		for r in results:
-			print(r)
-			print(docs['/'.join(r[0])])
+			doc = r[0]
+			print(doc.getID())
+			print(doc.getURL())
 		print('--------------')
 		q = input("Give me a search query: ")
 

@@ -9,6 +9,7 @@ import lxml.etree
 import sys, io, time
 
 ANALYTICS = dict()
+DTRANS = dict() #Translation table to turn doc ID to objects
 
 def addTokensToIndex(tokens: list, index: dict):
 	"""Takes text tokens found in self._tokens and adds to index:
@@ -17,20 +18,7 @@ def addTokensToIndex(tokens: list, index: dict):
 	index is defaultdict[list] -> can append any time
 	"""
 	for token, docid, weight in tokens:
-		index[token][docid] += weight
-	# for token, docid, weight in tokens:
-	# 	if token in index.keys():
-	# 		found = False
-	# 		for i in range(len(index[token])):
-	# 			if index[token][i][0] == docid:
-	# 				#If the same (token, docID) is in the index, add the weight
-	# 				found = True
-	# 				index[token][i] = (docid, index[token][i][1] + weight)
-	# 		if not found:
-	# 			#If it was not found, add it raw
-	# 			index[token].append((docid, weight))
-	# 	else:
-	# 		index[token].append((docid, weight))
+		index[token][DTRANS[docid]] += weight
 
 
 def _prettyPrintIndex(index: dict):
@@ -58,6 +46,7 @@ def main(index: dict, imgIndex: dict):
 		tokensList = [] # [(token, docID, priority)]
 		for l in interact_files.readFromBook():
 			d = DocID(l)
+			DTRANS[d.getID()] = d
 			# print('NEXT DOC!\n\tID:{}\n'.format(d.getID()))
 			if docCountCont < contPoint:
 				docCountPrev += 1
