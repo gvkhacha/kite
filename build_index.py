@@ -1,10 +1,7 @@
 from structures import DocID, Tokenizer
+from database import interact_files
+
 from collections import defaultdict, Counter
-
-import interact_files
-
-import lxml.html.diff
-import lxml.etree
 
 import sys, io, time
 

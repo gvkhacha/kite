@@ -1,5 +1,6 @@
-import interact_files
+from database import interact_files
 from structures import DocID
+
 import json
 from collections import Counter
 

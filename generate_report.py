@@ -8,7 +8,7 @@ This module will create a report on runtime with the current database found with
 """
 
 import simple_search as search
-import interact_files
+from database import interact_files
 
 import os #To get size of index
 
