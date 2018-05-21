@@ -73,7 +73,7 @@ if __name__ == '__main__':
 		""" Index isn't necessarily needed until we need to merge...Maybe better to keep it
 		out of memory, but either way is okay"""
 		index = defaultdict(Counter) # {token : {docID: priority} }
-		imgIndex = defaultdict(list) # {(title, imgAlt): [(srcurl, priority)]}
+		imgIndex = defaultdict(Counter) # {(title, imgAlt): [(srcurl, priority)]}
 		interact_files.resetIndexFiles()
 	else:
 		raise Warning("Invalid command line input")

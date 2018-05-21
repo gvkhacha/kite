@@ -36,7 +36,6 @@ def resetIndexFiles() -> None:
 	try:
 		for file in os.listdir('database/'):
 			if file.endswith('.pickle'):
-				print("Found one")
 				p = os.path.join("database/", file)
 				os.rename(p, '{}.bak'.format(p))
 				# os.rename(file, '{}.bak'.format(file))

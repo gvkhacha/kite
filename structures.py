@@ -23,6 +23,48 @@ class DocID:
 	def getPath(self) -> str:
 		return self._filepath
 
+class ImgID:
+	def __init__(self, docid: DocID, alt: str, src: str, title: str, value):
+		self._doc = docid
+		self._src = src
+		self._tokens = []
+
+		weight = 30 * value
+		if len(src) > 200:
+			return
+		for text in [title, alt, self._doc.getURL()]:
+			try:
+				if len(text) > 20:
+					continue
+				matches = re.findall(r'\w+', text.lower())
+			except AttributeError:
+				continue # There was no text
+			except TypeError:
+				continue
+			for t in matches:
+				self._tokens.append( (t, weight) )
+			weight -= 10
+
+	def getID(self) -> (str, str):
+		return self._doc.getID()
+
+	def getURL(self) -> str:
+		return self._doc.getURL()
+
+	def getPath(self) -> str:
+		return self._doc.getPath()
+
+	def getImgURL(self) -> str:
+		return self._src
+
+	def getTokens(self) -> list:
+		return self._tokens
+
+	def addToIndex(self, imgIndex) -> None:
+		for token, weight in self._tokens:
+			imgIndex[token][self] += weight
+
+
 class Tokenizer:
 	def __init__(self, doc: DocID, tokens: list, imgIndex: dict):
 		self._doc = doc
@@ -83,10 +125,9 @@ class Tokenizer:
 			srcURL = src
 		else:
 			srcURL = self._rootURL + element['src']
+		value = len(list(element.parents)) * 0.22
+		ImgID(self._doc, alt, srcURL, self._title, value).addToIndex(self._imgIndex)
 
-		val = (srcURL, len(list(element.parents)) * 0.22)
-		if key not in self._imgIndex:
-			self._imgIndex[key].append(val)
 
 	def _determineText(self, element) -> None:
 		"""Determine the weight of the text found, send to another method to 
