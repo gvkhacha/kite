@@ -3,3 +3,4 @@ WEBPAGES_RAW/
 *.pickle
 *.pickle.bak
 Logs/
+*.sqlite

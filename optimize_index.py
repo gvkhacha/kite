@@ -5,17 +5,15 @@ from structures import DocID
 import math, sqlite3
 
 
-def insertIntoDb(data: list, cursor) -> None:
+def insertIntoDb(c, data: list) -> None:
 	""" Takes data and inserts into 'occurances' table of
 	database (SQL) """
-	# for i in data:
-	# 	print(i)
-	# 	print(type(i))
-	cursor.executemany("INSERT INTO occurances VALUES (?, ?, ?)", data)
+	# c.execute("INSERT INTO occurances (token, doc, weight) VALUES ('{}', '{}', {:.4f})".format(token, doc, weight))
+	c.executemany("INSERT INTO occurances VALUES (?, ?, ?)", data)
 
 	
 
-def calculateWeight(token: str, values: dict, numDocs: int) -> None:
+def calculateWeight(token: str, values: dict, numDocs: int, c) -> None:
 	""" Looking at a single token, and values already have
 	term frequencies: calculates weight of each document 
 	based on normalized term frequency and inverse document
@@ -31,6 +29,7 @@ def calculateWeight(token: str, values: dict, numDocs: int) -> None:
 		weight *= math.log(numDocs/docFreq, 10)
 		x, y = doc.getID()
 		docToString = "{}/{}:{}".format(x, y, doc.getURL())
+		# insertIntoDb(c, token, docToString, weight)
 		data.append( (token, docToString, weight) )
 	return data
 
@@ -43,15 +42,12 @@ def main():
 	index = interact_files.loadIndexFromFile('main')
 	numDocs = index['& LAST DOC &']
 
-	count = 0
 	for k, v in index.items():
-		if count > 1000:
-			break
-		count += 1
 		if isinstance(v, dict):
-			data = calculateWeight(k, v, numDocs)
-			insertIntoDb(data, c)
-	c.close()
+			data = calculateWeight(k, v, numDocs, c)
+			insertIntoDb(c, data)
+	conn.commit()
+	conn.close()
 
 if __name__ == '__main__':
 	main()
