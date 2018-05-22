@@ -9,6 +9,7 @@ name = "pypi"
 lxml = "*"
 "bs4" = "*"
 nltk = "*"
+django = "*"
 
 [requires]
 python_version = "3.5"
