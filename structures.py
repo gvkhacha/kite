@@ -74,6 +74,7 @@ class Tokenizer:
 			self._soup = BeautifulSoup(htmlFile, 'lxml')
 		self._getDocData()
 		#self._title, self._comments, self._rootURL
+		self._tokenizeURL()
 
 	def findAllTokens(self) -> None:
 		""" Walks through all HTML elements in the document,
@@ -100,7 +101,17 @@ class Tokenizer:
 		root = self._doc.getURL().split('/')
 		if '.' in root[-1]:
 			root = root[:-1]
-		self._rootURL = '/'.join(root) + '/'	
+		self._rootURL = '/'.join(root) + '/'		
+
+	def _tokenizeURL(self) -> None:
+		""" Parses through URL, ignoring query portion, and adds each part as a
+		token itself """
+		if '?' in self._doc.getURL():
+			url = self._doc.getURL()[self._doc.index('?'):]
+		else:
+			url = self._doc.getURL()
+		for part in set(url.split()): # set to remove duplicates
+			self._addTextToIndex(part, 4)
 
 	def _addImage(self, element) -> None:
 		""" Element starts with <img> tag -> Finds details and adds 
@@ -135,14 +146,16 @@ class Tokenizer:
 		parents = list(element.parents)
 		weight = 1
 		parentTags = [i.name for i in parents]
-		for h in ['h1','h2','h3','h4','h5','h6']:
+		hweight = 1
+		for h in ['h6','h5','h4','h3','h2','h1']:
+			hweight += 1
 			if h in parentTags:
-				weight = int(100/int(h[-1]))
+				weight = hweight
 				break				
 		if 'title' in parentTags:
-			weight = 130
+			weight = 10
 		elif 'b' in parentTags or 'i' in parentTags:
-			weight = 60
+			weight = 2
 		if 'script' in parentTags or 'style' in parentTags:
 			# Text is in a script, can ignore
 			return
