@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup, Comment
-# from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.stem.wordnet import WordNetLemmatizer
 
 import re
 
-# lmtzr = WordNetLemmatizer() #Not sure, but probably better to init once.
+lmtzr = WordNetLemmatizer() #Not sure, but probably better to init once.
 
 class DocID:
 	def __init__(self, bookentry: str):
@@ -106,10 +106,9 @@ class Tokenizer:
 	def _tokenizeURL(self) -> None:
 		""" Parses through URL, ignoring query portion, and adds each part as a
 		token itself """
+		url = self._doc.getURL()
 		if '?' in self._doc.getURL():
-			url = self._doc.getURL()[self._doc.index('?'):]
-		else:
-			url = self._doc.getURL()
+			url = url[:url.index('?')]
 		for part in set(url.split()): # set to remove duplicates
 			self._addTextToIndex(part, 4, False)
 

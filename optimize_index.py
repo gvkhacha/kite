@@ -69,7 +69,7 @@ def mainToDatabase(c):
 
 def imageToDatabase(c):
 	imgIndex = interact_files.loadIndexFromFile('img')
-	numDocs = 37455 # Didn't save this, just going to write as is
+	numDocs = 850 # Didn't save this, just going to write as is
 
 	for k, v in imgIndex.items():
 		if isinstance(v, dict):
@@ -80,7 +80,11 @@ def main():
 	conn = sqlite3.connect('index.sqlite')
 	c = conn.cursor()
 
-	# mainToDatabase(c)
+	c.execute("CREATE TABLE IF NOT EXISTS occurances (token, doc, weight)")
+	c.execute("CREATE TABLE IF NOT EXISTS images (token, doc, imgurl, weight)")
+	conn.commit()
+
+	mainToDatabase(c)
 	imageToDatabase(c)
 
 	conn.commit()
