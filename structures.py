@@ -111,7 +111,7 @@ class Tokenizer:
 		else:
 			url = self._doc.getURL()
 		for part in set(url.split()): # set to remove duplicates
-			self._addTextToIndex(part, 4)
+			self._addTextToIndex(part, 4, False)
 
 	def _addImage(self, element) -> None:
 		""" Element starts with <img> tag -> Finds details and adds 
@@ -145,6 +145,7 @@ class Tokenizer:
 		add to dictionary"""
 		parents = list(element.parents)
 		weight = 1
+		lemm = True
 		parentTags = [i.name for i in parents]
 		hweight = 1
 		for h in ['h6','h5','h4','h3','h2','h1']:
@@ -154,15 +155,16 @@ class Tokenizer:
 				break				
 		if 'title' in parentTags:
 			weight = 10
+			lemm = False
 		elif 'b' in parentTags or 'i' in parentTags:
 			weight = 2
 		if 'script' in parentTags or 'style' in parentTags:
 			# Text is in a script, can ignore
 			return
 
-		self._addTextToIndex(element, weight)
+		self._addTextToIndex(element, weight, lemm)
 
-	def _addTextToIndex(self, text, weight) -> None:
+	def _addTextToIndex(self, text, weight, lemm=True) -> None:
 		"""Takes the text, tokenizes with language changes and number differences"""
 		matches = re.findall(r'\w+', text.lower())
 		for i in range(len(matches)):
@@ -176,8 +178,7 @@ class Tokenizer:
 					self._tokens.append( (after, self._doc.getID(), weight) )
 
 			except ValueError:
-				# It's not a number...
-				# Lemmatizing first, not sure if thats best option yet.
-				# self._tokens.append( (lmtzr.lemmatize(matches[i]), self._doc.getID(), weight) )
-				# Removing lemmatization for now				
-				self._tokens.append( ((matches[i], self._doc.getID(), weight))) 
+				if lemm:
+					self._tokens.append( (lmtzr.lemmatize(matches[i]), self._doc.getID(), weight) )
+				else:
+					self._tokens.append( ((matches[i], self._doc.getID(), weight)) ) 
