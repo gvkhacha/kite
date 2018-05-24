@@ -18,7 +18,7 @@ def _formatResults(raw: list) -> list:
 		docid, url = doc.split(':')
 		if not url.startswith('http'):
 			url = 'http://' + url
-		results.append( (docid, url) )
+		results.append( {'id':docid,'url':url} )
 	return results
 
 
