@@ -1,6 +1,7 @@
 from django.db import connection
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 import urllib.parse
+import re
 
 def _getResultFromIndex(query: str) -> list:
 	""" Return raw result sqlite database """
@@ -9,7 +10,7 @@ def _getResultFromIndex(query: str) -> list:
 		cursor.execute('SELECT * FROM occurances WHERE token=%s ORDER BY weight DESC', q)
 		return cursor.fetchmany(10)
 
-def _formatResults(raw: list) -> list:
+def _formatResults(raw: list, query: str) -> list:
 	""" Taking raw results from database, format the data
 	into usable format for printing 
 	raw: [('token', 'ID:URL', WEIGHT)]
@@ -19,10 +20,33 @@ def _formatResults(raw: list) -> list:
 		docid, url = doc.split(':')
 		if not url.startswith('http'):
 			url = 'http://' + url
-		results.append( {'id':docid,'url':url, 'meta':_getPageMetaData(docid, url)} )
+		results.append( {'id':docid,'url':url, 'meta':_getPageMetaData(docid, url, query)} )
 	return results
 
-def _getPageMetaData(docid: str, url: str) -> dict:
+def _tagVisible(element):
+	""" Helper function to filter all non-visible text from soup document """
+	if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
+		return False
+	if isinstance(element, Comment):
+		return False
+	return True
+
+def _findSurroundingWords(soup, query: str) -> [str]:
+	""" 
+	Uses regex to find words around the given query to use as website description if other description was not found...
+	Uses soup and extracts all not-visible text first. Considers first 3 unique results found, returns as list of string
+	"""
+	texts = soup.findAll(text=True)
+	visibleTexts = ''.join([t for t in filter(_tagVisible, soup.body.findAll(text=True))])
+	sub = '(\w*)\W*(\w*)\W*({})\W*(\w*)\W*(\w*)'.format(query)
+	results = set()
+	for i in re.findall(sub, visibleTexts, re.IGNORECASE):
+		results.add(" ".join([x for x in i if x != '']))
+		if len(results) > 3:
+			break
+	return results
+
+def _getPageMetaData(docid: str, url: str, query: str) -> dict:
 	""" Uses doc id to find document and find meta data
 	(parsing through html head if necessary)"""
 	result = dict()
@@ -35,7 +59,7 @@ def _getPageMetaData(docid: str, url: str) -> dict:
 				foundDesc = True
 				break
 		if not foundDesc:
-			result['desc'] = "No Meta Description found for this website."
+			result['desc'] = "...".join(_findSurroundingWords(soup, query))
 		try:
 			result['title'] = soup.title.string
 		except:
@@ -49,5 +73,8 @@ def searchIndex(query: str) -> list:
 	""" Takes string query (generally from input)
 	makes operations on them to be able to index sqlite
 	"""
+	query = query.lower().strip()
+	raw = _getResultFromIndex(query)
+	results = _formatResults(raw, query)
 	#Reversed because they get appended into a list in descending order
-	return reversed(_formatResults(_getResultFromIndex(query)))
+	return reversed(results)
