@@ -1,5 +1,5 @@
 from django.db import connection
-
+from bs4 import BeautifulSoup
 
 def _getResultFromIndex(query: str) -> list:
 	""" Return raw result sqlite database """
@@ -18,9 +18,25 @@ def _formatResults(raw: list) -> list:
 		docid, url = doc.split(':')
 		if not url.startswith('http'):
 			url = 'http://' + url
-		results.append( {'id':docid,'url':url} )
+		results.append( {'id':docid,'url':url, 'meta':_getPageMetaData(docid)} )
 	return results
 
+def _getPageMetaData(docid: str) -> dict:
+	""" Uses doc id to find document and find meta data
+	(parsing through html head if necessary)"""
+	result = dict()
+	with open('../WEBPAGES_RAW/{}'.format(docid), 'r') as file:
+		soup = BeautifulSoup(file, 'lxml')
+		foundDesc = False
+		for meta in soup.find_all('meta'):
+			if meta.get('name', '') == 'description':
+				result['desc'] = meta['content']
+				foundDesc = True
+				break
+		if not foundDesc:
+			result['desc'] = "No Meta Description found for this website."
+		result['title'] = soup.title.string
+	return result
 
 
 def searchIndex(query: str) -> list:

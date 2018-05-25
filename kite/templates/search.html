@@ -1,8 +1,9 @@
 <form action="/" method="post">
-<input type="text" name="term" size="30"> <input type="submit" value="Search">
+<input type="text" name="term" size="30" value="{{query}}"> <input type="submit" value="Search">
 </form>
 {% if result %}
 	{% for res in result %}
+	<h3><a href='{{ res.url }}'>{{ res.meta.title }}</a></h3>
 	<li>{{ res }}</li>
 	{% endfor %}
 {% endif %}
