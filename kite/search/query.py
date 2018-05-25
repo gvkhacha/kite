@@ -23,8 +23,6 @@ def _formatResults(raw: list, query: str) -> list:
 		index = doc.find(':')
 		docid = doc[:index]
 		url = doc[index+1:]
-		print(docid)
-		print(url)
 		if not url.startswith('http'):
 			url = 'http://' + url
 		results.append( {'id':docid,'url':url, 'meta':_getPageMetaData(docid, url, query)} )
@@ -80,6 +78,7 @@ def searchIndex(query: str) -> list:
 	""" Takes string query (generally from input)
 	makes operations on them to be able to index sqlite
 	"""
+	query = re.sub(r' \W+', '', query)
 	query = lmtzr.lemmatize(query.lower().strip())
 	raw = _getResultFromIndex(query)
 	results = _formatResults(raw, query)

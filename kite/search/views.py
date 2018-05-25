@@ -13,6 +13,9 @@ def search(request):
 	if request.POST:
 		if request.POST['term'] == '':
 			return render_to_response('index.html')
-		return render_to_response('search.html', {'query': request.POST['term'], 'result': query.searchIndex(request.POST['term'])})
+		if 'main' in request.POST:
+			return render_to_response('search.html', {'query': request.POST['term'], 'result': query.searchIndex(request.POST['term'])})
+		elif 'images' in request.POST:
+			return render_to_response('index.html')
 	else:
-		return render_to_response('search.html')
+		return render_to_response('index.html')
