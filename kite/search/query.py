@@ -2,6 +2,9 @@ from django.db import connection
 from bs4 import BeautifulSoup, Comment
 import urllib.parse
 import re
+from nltk.stem.wordnet import WordNetLemmatizer
+
+lmtzr = WordNetLemmatizer() #Not sure, but probably better to init once.
 
 def _getResultFromIndex(query: str) -> list:
 	""" Return raw result sqlite database """
@@ -17,7 +20,11 @@ def _formatResults(raw: list, query: str) -> list:
 	result: [(ID, URL, TITLE)]"""
 	results = []
 	for tok, doc, idf in raw:
-		docid, url = doc.split(':')
+		index = doc.find(':')
+		docid = doc[:index]
+		url = doc[index+1:]
+		print(docid)
+		print(url)
 		if not url.startswith('http'):
 			url = 'http://' + url
 		results.append( {'id':docid,'url':url, 'meta':_getPageMetaData(docid, url, query)} )
@@ -73,7 +80,7 @@ def searchIndex(query: str) -> list:
 	""" Takes string query (generally from input)
 	makes operations on them to be able to index sqlite
 	"""
-	query = query.lower().strip()
+	query = lmtzr.lemmatize(query.lower().strip())
 	raw = _getResultFromIndex(query)
 	results = _formatResults(raw, query)
 	#Reversed because they get appended into a list in descending order
