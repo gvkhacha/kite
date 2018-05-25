@@ -6,7 +6,7 @@ from search import query
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return render_to_response('home.html')
 
 @csrf_exempt
 def search(request):
