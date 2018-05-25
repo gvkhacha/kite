@@ -11,7 +11,8 @@ def index(request):
 @csrf_exempt
 def search(request):
 	if request.POST:
-		print(request.POST['term'])
+		if request.POST['term'] == '':
+			return render_to_response('index.html')
 		return render_to_response('search.html', {'query': request.POST['term'], 'result': query.searchIndex(request.POST['term'])})
 	else:
 		return render_to_response('search.html')

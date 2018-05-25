@@ -1,0 +1,27 @@
+html, body{
+	margin: 0;
+	padding: 0;
+}
+
+.search-bar{
+	height: 70px;
+	width: 100%;
+	background-color: #fafafa;
+	border-bottom: 1px solid #222;
+	display: inline-block;
+}
+
+.search-bar form{
+	width: 50%;
+	margin-top: 20px;
+}
+
+.kite-logo{
+	width: 125px;
+	height: 70px;
+	float: left;
+}
+
+.results{
+	width: 75%;
+}

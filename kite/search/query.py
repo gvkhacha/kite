@@ -49,4 +49,5 @@ def searchIndex(query: str) -> list:
 	""" Takes string query (generally from input)
 	makes operations on them to be able to index sqlite
 	"""
-	return _formatResults(_getResultFromIndex(query))
+	#Reversed because they get appended into a list in descending order
+	return reversed(_formatResults(_getResultFromIndex(query)))
