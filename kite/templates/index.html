@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 
   <head>
   	<meta charset="utf-8">
   	<title>Kite</title>
   	<meta name="description" content="Kite Search Engine for ICS UCI corpus">
   	<meta name="author" content="Garik Khachatryan">
+
+	<link rel="stylesheet" type="text/css" href="{% static '/styles/index.css' %}" />
   </head>
 
   <body class="kite-home">
   	<div class="home-search">
+  		<img alt="Kite Search" src="http://placehold.it/500x250" />
   		<form action="/search" method="post">
-			<input type="text" name="term" size="30"> <input type="submit" value="Search">
+			<input type="text" class="input-text" name="term" size="30"> <input class="submit" type="submit" value="Search">
 		</form>
   	</div>
 

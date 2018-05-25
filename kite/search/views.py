@@ -6,7 +6,7 @@ from search import query
 
 
 def index(request):
-    return render_to_response('home.html')
+    return render_to_response('index.html')
 
 @csrf_exempt
 def search(request):
