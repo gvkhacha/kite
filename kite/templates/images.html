@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+  <head>
+  	<meta charset="utf-8">
+  	<title>Kite Search: {{ query }}</title>
+  	<meta name="description" content="Kite Search Engine for ICS UCI corpus generated results for the query: {{ query }}">
+  	<meta name="author" content="Garik Khachatryan">
+
+	<link rel="stylesheet" type="text/css" href="{% static '/styles/search.css' %}" />
+  </head>
+
+  <body class="kite-search">
+  	<div class="search-bar">
+  		<a href="/"><img alt="Kite Logo" src="http://placehold.it/125x70" class="kite-logo" /></a>
+	<form action="/search" method="post">
+		<input type="text" name="term" size="30" value="{{query}}"> <input type="submit" value="Search" name="main"> <input class="submit" type="submit" value="Image Search" name="images">
+	</form>
+  	</div>
+  	<div class="results">
+		{% if result %}
+			{% for res in result %}
+      <img src={{ res.img }} />
+			{% endfor %}
+		{% endif %}
+  	</div>
+  </body>
+
+</html>
+
