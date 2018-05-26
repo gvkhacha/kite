@@ -8,7 +8,7 @@ lmtzr = WordNetLemmatizer() #Not sure, but probably better to init once.
 
 def _getResultFromIndex(query: str) -> list:
 	""" Return raw result sqlite database """
-	q = tuple(query.strip().split())
+	q = (query, )
 	with connection.cursor() as cursor:
 		cursor.execute('SELECT * FROM occurances WHERE token=%s ORDER BY weight DESC', q)
 		return cursor.fetchmany(10)
@@ -19,13 +19,13 @@ def _formatResults(raw: list, query: str) -> list:
 	raw: [('token', 'ID:URL', WEIGHT)]
 	result: [(ID, URL, TITLE)]"""
 	results = []
-	for tok, doc, idf in raw:
+	for doc, idf in raw:
 		index = doc.find(':')
 		docid = doc[:index]
 		url = doc[index+1:]
 		if not url.startswith('http'):
 			url = 'http://' + url
-		results.append( {'id':docid,'url':url, 'meta':_getPageMetaData(docid, url, query)} )
+		results.append( {'id':docid, 'url':url, 'weight': idf, 'meta':_getPageMetaData(docid, url, query)} )
 	return results
 
 def _tagVisible(element):
@@ -102,16 +102,39 @@ def _modifyQuery(query: str) -> [str]:
 			results.append(lmtzr.lemmatize(q))
 	return results
 
+def _combineReuslts(raw: list) -> list:
+	""" Gets a list of (query, docid, weight) pairs and returns a list of
+	(docid, weight) pairs that have no unique docIDS. """
+	results = []
+	foundDocs = set()
+	for tok, doc, weight in raw:
+		if doc in foundDocs:
+			for i in range(len(results)):
+				if results[i][0] == doc:
+					results[i] = (doc, results[i][1] + weight)
+		else:
+			foundDocs.add(doc)
+			results.append( (doc, weight) )
+	return results
 
 
 def searchIndex(query: str) -> list:
 	""" Takes string query (generally from input)
 	makes operations on them to be able to index sqlite
 	"""
-	print(_modifyQuery(query))
-	query = re.sub(r' \W+', '', query)
-	query = lmtzr.lemmatize(query.lower().strip())
-	raw = _getResultFromIndex(query)
-	results = _formatResults(raw, query)
+	allResults = []
+	for q in _modifyQuery(query):
+		allResults.extend(_getResultFromIndex(q))
+	combined = _combineReuslts(allResults)
+	final = _formatResults(combined, query)
+	#combineResults(allResults)?
+
+
+
+	# print(_modifyQuery(query))
+	# query = re.sub(r' \W+', '', query)
+	# query = lmtzr.lemmatize(query.lower().strip())
+	# raw = _getResultFromIndex(query)
+	# results = _formatResults(allResults, query)
 	#Reversed because they get appended into a list in descending order
-	return reversed(results)
+	return sorted(final, key=lambda x: x['weight'], reverse=True)
