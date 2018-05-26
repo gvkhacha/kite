@@ -73,11 +73,42 @@ def _getPageMetaData(docid: str, url: str, query: str) -> dict:
 			result['title'] = parsed.netloc + ' ' + split[0] + ' ' + split[-1]
 	return result
 
+def _isint(s: str) -> bool:
+	try:
+		int(s)
+		return True
+	except ValueError:
+		return False
+
+def _modifyQuery(query: str) -> [str]:
+	""" Takes the full string query given by user input and modifies it 
+	to separate queries that can be used for immediate SQL search.
+	Also lemmatizes and adds that to list as well."""
+	fields = [re.sub(r'\W+', '', q) for q in query.split()]
+	results = []
+	for i in range(len(fields)):
+		if _isint(fields[i]):
+			# add query with strings before and after number
+			# don't need to lemmatize b/c it doesn't during building index
+			if i != 0:
+				prev = "{} {}".format(fields[i-1], fields[i]).lower()
+				results.append(prev)
+			if i != len(fields)-1:
+				after = "{} {}".format(fields[i], fields[i+1]).lower()
+				results.append(after)
+		else:
+			q = fields[i].lower().strip()
+			results.append(q)
+			results.append(lmtzr.lemmatize(q))
+	return results
+
+
 
 def searchIndex(query: str) -> list:
 	""" Takes string query (generally from input)
 	makes operations on them to be able to index sqlite
 	"""
+	print(_modifyQuery(query))
 	query = re.sub(r' \W+', '', query)
 	query = lmtzr.lemmatize(query.lower().strip())
 	raw = _getResultFromIndex(query)
