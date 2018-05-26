@@ -6,12 +6,21 @@ from nltk.stem.wordnet import WordNetLemmatizer
 
 lmtzr = WordNetLemmatizer() #Not sure, but probably better to init once.
 
-def _getResultFromIndex(query: str) -> list:
+def _getResultFromIndex(query: [str]) -> list:
 	""" Return raw result sqlite database """
-	q = (query, )
+	x = "('" + "', '".join(q for q in query) + "')"
 	with connection.cursor() as cursor:
-		cursor.execute('SELECT * FROM occurances WHERE token=%s ORDER BY weight DESC', q)
-		return cursor.fetchmany(10)
+		sql = 'SELECT * FROM occurances WHERE token IN {} ORDER BY weight DESC'.format(x)
+		cursor.execute(sql)
+		return cursor.fetchmany(10 * len(set(query)))
+	# q = (query, )
+	# ph = '?'
+	# query = tuple(query)
+	# placeholder = ', '.join(ph for _ in query)
+	# with connection.cursor() as cursor:
+	# 	sql = 'SELECT * FROM occurances WHERE token IN ({})'.format(placeholder)
+	# 	cursor.execute(sql, query)
+	# 	return cursor.fetchmany(10)
 
 def _formatResults(raw: list, query: str) -> list:
 	""" Taking raw results from database, format the data
@@ -122,19 +131,9 @@ def searchIndex(query: str) -> list:
 	""" Takes string query (generally from input)
 	makes operations on them to be able to index sqlite
 	"""
-	allResults = []
-	for q in _modifyQuery(query):
-		allResults.extend(_getResultFromIndex(q))
+	allResults = _getResultFromIndex(_modifyQuery(query))
+	# for q in _modifyQuery(query):
+		# allResults.extend(_getResultFromIndex(q))
 	combined = _combineReuslts(allResults)
 	final = _formatResults(combined, query)
-	#combineResults(allResults)?
-
-
-
-	# print(_modifyQuery(query))
-	# query = re.sub(r' \W+', '', query)
-	# query = lmtzr.lemmatize(query.lower().strip())
-	# raw = _getResultFromIndex(query)
-	# results = _formatResults(allResults, query)
-	#Reversed because they get appended into a list in descending order
 	return sorted(final, key=lambda x: x['weight'], reverse=True)
