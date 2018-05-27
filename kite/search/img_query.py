@@ -7,7 +7,7 @@ def _getResultFromIndex(query: str) -> list:
 	q = tuple(query.strip().split())
 	with connection.cursor() as cursor:
 		cursor.execute('SELECT * FROM images WHERE token=%s ORDER BY weight DESC', q)
-		return cursor.fetchmany(10)
+		return cursor.fetchall()
 
 def _formatResults(raw: list, query: str) -> list:
 	""" Taking raw results from database, format the data

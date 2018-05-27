@@ -21,7 +21,7 @@
   	<div class="results">
 		{% if result %}
 			{% for res in result %}
-      <img src={{ res.img }} />
+      <a href={{ res.url }}><img class="img-result" src={{ res.img }} /></a>
 			{% endfor %}
 		{% endif %}
   	</div>
