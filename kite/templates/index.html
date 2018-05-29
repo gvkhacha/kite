@@ -13,7 +13,7 @@
 
   <body class="kite-home">
   	<div class="home-search">
-  		<img alt="Kite Search" src="http://placehold.it/500x250" />
+  		<img alt="Kite Search" src="{% static '/img/logo.png' %}" />
   		<form action="/search" method="post">
 			<input type="text" class="input-text" name="term" size="30"> <input class="submit" type="submit" value="Search" name='main'> <input class="submit" type="submit" value="Image Search" name="images">
 		</form>
